@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quem é Esse Pokémon? — Desafio Diário</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800;900&display=swap"
+        rel="stylesheet">
+    <favicon src="/assets/favicon.png"> </favicon>
+<script src="/js/script.js" defer></script>
+</head>
+<body>
+    <div class="bg-ball b1"></div>
+    <div class="bg-ball b2"></div>
+    <div class="wrap">
+        <div class="eyebrow" id="date-label">— carregando data —</div>
+        <h1 class="title">Quem é esse Pokémon?</h1>
+        <div class="dex">
+            <div class="dex-header">
+                <div class="lens"></div>
+                <div class="dex-dots"><span></span><span></span><span></span></div>
+                <div class="label">POKÉDEX<br>DESAFIO Nº <span id="dex-num">???</span></div>
+            </div>
+
+            <div class="screen-bezel">
+                <div class="screen" id="screen">
+                    <div class="screen-topline">PRESSIONE START</div>
+                    <div class="silhouette-holder" id="silhouette-holder">
+                        <div class="loading-txt" id="loading-txt">AGUARDE,ESTAMOS CARREGANDO OS DADOS DO<br>POKÉMON...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="hint-row" id="hint-row">
+                    <button class="hint-btn" data-hint="color" disabled>
+                        <span class="hint-label">Dica</span>
+                        <span class="hint-value">Cor Principal</span>
+                    </button>
+                    <button class="hint-btn" data-hint="generation" disabled>
+                        <span class="hint-label">Dica</span>
+                        <span class="hint-value">Geração</span>
+                    </button>
+                    <button class="hint-btn" data-hint="type" disabled>
+                        <span class="hint-label">Dica</span>
+                        <span class="hint-value">Tipo</span>
+                    </button>
+                </div>
+
+                <div class="guess-row">
+                    <input type="text" id="guess-input" placeholder="Digite aqui..." disabled
+                        autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <button id="guess-btn" disabled>Já sei!</button>
+                </div>
+
+                <div class="tries-label" id="tries-label">Tentativas: 0 </div>
+                <div class="chips-wrap" id="chips-wrap"></div>
+            </div>
+        </div>
+        <footer> Dados via <a href="https://pokeapi.co/" target="_blank" rel="noopener noreferrer"> PokéAPI </a> · Um Pokémon novo aparece todo dia à meia-noite, aventure-se!
+            <br> Feito com ♥ por 
+            <a href="https://github.com/renataalvescunh" target="_blank" rel="noopener noreferrer"> Renata </a> </footer>
+    </div>
+</body>
+
+</html>
