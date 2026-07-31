@@ -254,6 +254,7 @@
             }
         }
 
+
         .loading-txt,
         .error-txt {
             font-family: 'Press Start 2P', monospace;
@@ -294,11 +295,51 @@
             border: 2px solid rgba(0, 0, 0, 0.25);
         }
 
+        .panel p {
+            font-size: 9px;
+            color: #ddd7d7;
+            margin-bottom: 12px;
+            margin-top: 1px;
+            text-align: center;
+            font-family: 'Press Start 2P', monospace;
+        }
+
         .hint-row {
             display: flex;
             gap: 8px;
             margin-bottom: 12px;
         }
+
+        .des-btn {
+            border-radius: 100%;
+            color: #ddd7d7;
+            height: 70px;
+            width: 70px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 10px;
+            background: linear-gradient(155deg, var(--shell-red-1), var(--shell-red-2) 70%);
+            border: 2px solid var(--shell-dark);
+                box-shadow:
+                        1px 2px 0 var(--shell-dark),
+                        inset 4px 8px 6px rgba(255, 255, 255, 0.15),
+                        inset 0 -30px 40px rgba(0, 0, 0, 0.15);
+          
+            padding: 8px 12px;
+            text-shadow: 0 1px 0 #161616, 0 2px 2px #888;
+        }
+        .des-btn:hover {
+            transform: translateX(-1px);
+        }
+        .des-btn:active {
+            transform: translateX(1px);
+        box-shadow:
+                0 18px 40px rgba(34, 34, 34, 0.5),
+                inset 0 5px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -30px 40px rgba(0, 0, 0, 0.15);
+    
+        }
+      
 
         .hint-btn {
             flex: 1;
@@ -328,14 +369,14 @@
 
         .hint-btn:disabled {
             cursor: default;
-            opacity: 0.55;
             box-shadow: none;
         }
 
         .hint-btn.revealed {
             background: var(--brand-yellow);
-            color: #3a2a00;
             border-color: var(--brand-yellow-dark);
+            color: #eeedec;
+            border-color: none;
             box-shadow: 0 3px 0 var(--brand-yellow-dark);
         }
 

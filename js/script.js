@@ -34,6 +34,7 @@
         hintRow: document.getElementById('hint-row'),
         input: document.getElementById('guess-input'),
         guessBtn: document.getElementById('guess-btn'),
+        desBtn: document.querySelector('.des-btn'), // Seleciona o botão de desistir/revelar
         triesLabel: document.getElementById('tries-label'),
         chipsWrap: document.getElementById('chips-wrap'),
         statStreak: document.getElementById('stat-streak'),
@@ -95,6 +96,7 @@
         types: [],
         imgUrl: '',
         solved: false,
+        giveUp: false,
         tries: [],
         hintsRevealed: []
     };
@@ -145,7 +147,7 @@
                 } else {
                     btn.querySelector('.hint-value').textContent = hintValueFor(kind);
                 }
-            } else if (state.hintsRevealed.length >= 2 || state.solved) {
+            } else if (state.hintsRevealed.length >= 2 || state.solved || state.giveUp) {
                 btn.disabled = true;
             } else {
                 btn.disabled = false;
@@ -165,6 +167,7 @@
         safeStorageSet('day:' + state.dateStr, {
             id: state.id,
             solved: state.solved,
+            giveUp: state.giveUp,
             tries: state.tries,
             hintsRevealed: state.hintsRevealed
         });
@@ -190,7 +193,7 @@
         renderStats();
     }
 
-    function markSolvedUI() {
+    function markSolvedUI(isDesist = false) {
         const img = document.getElementById('poke-img');
         if (img) {
             img.classList.remove('hidden-img');
@@ -202,9 +205,10 @@
         }
         if (els.input) {
             els.input.disabled = true;
-            els.input.placeholder = 'Já capturado hoje!';
+            els.input.placeholder = isDesist ? 'Pokémon revelado!' : 'Já capturado hoje!';
         }
         if (els.guessBtn) els.guessBtn.disabled = true;
+        if (els.desBtn) els.desBtn.disabled = true;
 
         if (els.hintRow) {
             const buttons = els.hintRow.querySelectorAll('.hint-btn');
@@ -218,16 +222,22 @@
             els.holder.parentElement.appendChild(nameBlock);
         }
         if (nameBlock) {
-            nameBlock.innerHTML =
-                '<div class="caught-name">' + state.displayName.toUpperCase() + '!</div>' +
-                '<div class="caught-sub">Capturado em ' + state.tries.length + (state.tries.length === 1 ? ' tentativa' : ' tentativas') + '</div>';
+            if (isDesist) {
+                nameBlock.innerHTML =
+                    '<div class="caught-name" style="color: #e74c3c;">É O ' + state.displayName.toUpperCase() + '!</div>' +
+                    '<div class="caught-sub">Você desistiu de adivinhar hoje.</div>';
+            } else {
+                nameBlock.innerHTML =
+                    '<div class="caught-name">' + state.displayName.toUpperCase() + '!</div>' +
+                    '<div class="caught-sub">Capturado em ' + state.tries.length + (state.tries.length === 1 ? ' tentativa' : ' tentativas') + '</div>';
+            }
         }
     }
 
     function handleGuess() {
         if (!els.input) return;
         const raw = els.input.value.trim();
-        if (!raw || state.solved) return;
+        if (!raw || state.solved || state.giveUp) return;
         const guess = normalize(raw);
         const correct = guess === normalize(state.nameEn) || guess === normalize(state.namePt);
 
@@ -235,7 +245,7 @@
             state.solved = true;
             persistDay();
             persistStreakAfterSolve();
-            markSolvedUI();
+            markSolvedUI(false);
             els.input.value = '';
         } else {
             if (!state.tries.map(normalize).includes(guess)) {
@@ -252,7 +262,19 @@
         }
     }
 
+    function handleDesist() {
+        if (state.solved || state.giveUp) return;
+        const confirmResult = confirm("Ei, treinador, tem certeza de sua escolha?");
+        if (confirmResult) {
+            state.giveUp = true;
+            persistDay();
+            markSolvedUI(true);
+        }
+    }
+
     if (els.guessBtn) els.guessBtn.addEventListener('click', handleGuess);
+    if (els.desBtn) els.desBtn.addEventListener('click', handleDesist);
+
     if (els.input) {
         els.input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') handleGuess();
@@ -310,7 +332,12 @@
             '<div class="sweep" id="sweep-el"></div>';
         const img = document.getElementById('poke-img');
         if (img) {
-            img.onload = () => { img.classList.remove('hidden-img'); };
+            img.onload = () => { 
+                if (state.solved || state.giveUp) {
+                    img.classList.remove('hidden-img');
+                    img.classList.add('revealed');
+                }
+            };
             img.onerror = () => { showError('IMAGEM NÃO<br>ENCONTRADA'); };
         }
     }
@@ -347,6 +374,7 @@
             types: data.types,
             imgUrl: data.imgUrl,
             solved: false,
+            giveUp: false,
             tries: [],
             hintsRevealed: []
         };
@@ -355,6 +383,7 @@
         const savedDay = await safeStorageGet('day:' + dateStr);
         if (savedDay && savedDay.id === id) {
             state.solved = !!savedDay.solved;
+            state.giveUp = !!savedDay.giveUp;
             state.tries = savedDay.tries || [];
             state.hintsRevealed = savedDay.hintsRevealed || [];
         }
@@ -365,33 +394,11 @@
 
         if (els.input) els.input.disabled = false;
         if (els.guessBtn) els.guessBtn.disabled = false;
+        if (els.desBtn) els.desBtn.disabled = false;
 
-        if (state.solved) {
+        if (state.solved || state.giveUp) {
             setTimeout(() => {
-                const img = document.getElementById('poke-img');
-                if (img) { img.classList.remove('hidden-img'); img.classList.add('revealed'); }
-                if (els.input) {
-                    els.input.disabled = true;
-                    els.input.placeholder = 'Já capturado hoje!';
-                }
-                if (els.guessBtn) els.guessBtn.disabled = true;
-
-                if (els.hintRow) {
-                    const buttons = els.hintRow.querySelectorAll('.hint-btn');
-                    buttons.forEach(btn => btn.disabled = true);
-                }
-
-                let nameBlock = document.getElementById('caught-block');
-                if (!nameBlock && els.holder && els.holder.parentElement) {
-                    nameBlock = document.createElement('div');
-                    nameBlock.id = 'caught-block';
-                    els.holder.parentElement.appendChild(nameBlock);
-                }
-                if (nameBlock) {
-                    nameBlock.innerHTML =
-                        '<div class="caught-name">' + state.displayName.toUpperCase() + '!</div>' +
-                        '<div class="caught-sub">Capturado em ' + state.tries.length + (state.tries.length === 1 ? ' tentativa' : ' tentativas') + '</div>';
-                }
+                markSolvedUI(state.giveUp);
             }, 60);
         }
     }
