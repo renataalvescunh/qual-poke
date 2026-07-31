@@ -34,12 +34,13 @@
         hintRow: document.getElementById('hint-row'),
         input: document.getElementById('guess-input'),
         guessBtn: document.getElementById('guess-btn'),
-        desBtn: document.querySelector('.des-btn'), // Seleciona o botão de desistir/revelar
+        desBtn: document.querySelector('.des-btn'),
         triesLabel: document.getElementById('tries-label'),
         chipsWrap: document.getElementById('chips-wrap'),
         statStreak: document.getElementById('stat-streak'),
         statBest: document.getElementById('stat-best'),
         statTotal: document.getElementById('stat-total'),
+        datalist: document.getElementById('pokemon-list') // Seleção do datalist
     };
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -297,6 +298,28 @@
         }
     }
 
+    // Carrega a lista completa de nomes para o Autocomplete (datalist)
+    async function loadPokemonSuggestions() {
+        if (!els.datalist) return;
+        try {
+            const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=' + MAX_DEX_ID);
+            if (!res.ok) return;
+            const data = await res.json();
+            
+            const fragment = document.createDocumentFragment();
+            data.results.forEach(p => {
+                const option = document.createElement('option');
+                // Formata "marill" para "Marill"
+                const formattedName = p.name.charAt(0).toUpperCase() + p.name.slice(1);
+                option.value = formattedName;
+                fragment.appendChild(option);
+            });
+            els.datalist.appendChild(fragment);
+        } catch (e) {
+            // Falha silenciosa se não carregar as sugestões
+        }
+    }
+
     async function fetchPokemon(id) {
         const [pokeRes, speciesRes] = await Promise.all([
             fetch('https://pokeapi.co/api/v2/pokemon/' + id),
@@ -327,14 +350,16 @@
 
     function buildScreenImage(imgUrl) {
         if (!els.holder) return;
+        
         els.holder.innerHTML =
             '<img id="poke-img" src="' + imgUrl + '" class="hidden-img" alt="Silhueta de Pokémon">' +
             '<div class="sweep" id="sweep-el"></div>';
+            
         const img = document.getElementById('poke-img');
         if (img) {
             img.onload = () => { 
+                img.classList.remove('hidden-img');
                 if (state.solved || state.giveUp) {
-                    img.classList.remove('hidden-img');
                     img.classList.add('revealed');
                 }
             };
@@ -349,6 +374,9 @@
         if (els.dexNum) els.dexNum.textContent = String(id).padStart(4, '0');
 
         if (els.holder) els.holder.innerHTML = '<div class="loading-txt" id="loading-txt">CARREGANDO<br>DADOS DO<br>POKÉMON...</div>';
+
+        // Carrega sugestões do autocomplete sem travar a inicialização do jogo
+        loadPokemonSuggestions();
 
         // load streak
         const savedStreak = await safeStorageGet('streak');

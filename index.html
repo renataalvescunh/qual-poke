@@ -3,20 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quem é Esse Pokémon? — Desafio Diário</title>
-
-    <!-- Fontes Google -->
+    <title>Quem é Esse Pokémon?</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
-
-    <!-- CSS (usando caminho relativo ./ ) -->
     <link rel="stylesheet" href="./css/style.css">
-
-    <!-- Favicon correto -->
     <link rel="icon" type="image/png" href="./assets/favicon.png">
-
-    <!-- JS (usando caminho relativo ./ ) -->
     <script src="./js/script.js" defer></script>
 </head>
 <body>
@@ -34,7 +26,6 @@
 
             <div class="screen-bezel">
                 <div class="screen" id="screen">
-                    <div class="screen-topline">PRESSIONE START</div>
                     <div class="silhouette-holder" id="silhouette-holder">
                         <div class="loading-txt" id="loading-txt">AGUARDE,ESTAMOS CARREGANDO OS DADOS DO<br>POKÉMON...</div>
                     </div>
@@ -61,18 +52,19 @@
             </button>
                 </div>
 
-                <div class="guess-row">
-                    <input type="text" id="guess-input" placeholder="Digite aqui..." disabled
-                        autocomplete="off" autocapitalize="off" spellcheck="false">
-                    <button id="guess-btn" disabled>Já sei!</button>
-                </div>
+            <div class="guess-row">
+                <input type="text" id="guess-input" placeholder="Digite aqui..." list="pokemon-list" disabled autocomplete="off"
+                    autocapitalize="off" spellcheck="false">
+                <datalist id="pokemon-list"></datalist>
+                <button id="guess-btn" disabled>Já sei!</button>
+            </div>
 
                 <div class="tries-label" id="tries-label">Tentativas: 0 </div>
                 <div class="chips-wrap" id="chips-wrap"></div>
             </div>
         </div>
         <footer> Dados via <a href="https://pokeapi.co/" target="_blank" rel="noopener noreferrer"> PokéAPI </a> · Um Pokémon novo aparece todo dia à meia-noite, aventure-se!
-            <br> Feito com ♥ por 
+            <br> Por 
             <a href="https://github.com/renataalvescunh" target="_blank" rel="noopener noreferrer"> Renata </a> </footer>
     </div>
 </body>
