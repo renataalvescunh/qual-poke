@@ -97,6 +97,7 @@
                 inset 0 -30px 40px rgba(0, 0, 0, 0.15);
             position: relative;
             max-width: 450px;
+            text-align: center;
         }
 
         .dex-header {
