@@ -96,6 +96,7 @@
                 inset 0 2px 0 rgba(255, 255, 255, 0.15),
                 inset 0 -30px 40px rgba(0, 0, 0, 0.15);
             position: relative;
+            max-width: 450px;
         }
 
         .dex-header {
@@ -532,7 +533,7 @@
         }
 
         .wrong-chip {
-            background: rgba(224, 36, 26, 0.18);
+            background: rgba(255, 102, 94, 0.18);
             border: 1.5px solid rgba(224, 36, 26, 0.55);
             color: #ffb3ad;
             padding: 3px 9px;

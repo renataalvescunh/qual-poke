@@ -63,8 +63,19 @@
         return h;
     }
 
+
+    function mix32(h) {
+        h = h >>> 0;
+        h ^= h >>> 16;
+        h = Math.imul(h, 0x85ebca6b);
+        h ^= h >>> 13;
+        h = Math.imul(h, 0xc2b2ae35);
+        h ^= h >>> 16;
+        return h >>> 0;
+    }
+
     function dailyId(dateStr) {
-        const h = hashDate('pokemon-' + dateStr);
+        const h = mix32(hashDate('pokemon-' + dateStr));
         return (h % MAX_DEX_ID) + 1;
     }
 
@@ -93,6 +104,7 @@
         namePt: '',
         displayName: '',
         color: '',
+        genus: '',
         generation: '',
         types: [],
         imgUrl: '',
@@ -124,7 +136,7 @@
     }
 
     function hintValueFor(kind) {
-        if (kind === 'color') return COLOR_LABEL[state.color] || state.color;
+        if (kind === 'color') return state.genus || COLOR_LABEL[state.color] || state.color;
         if (kind === 'generation') return GEN_LABEL[state.generation] || state.generation;
         if (kind === 'type') return state.types.map(t => TYPE_LABEL[t] || t).join(' / ');
         return '';
@@ -138,7 +150,7 @@
             if (state.hintsRevealed.includes(kind)) {
                 btn.classList.add('revealed');
                 btn.disabled = true;
-                btn.querySelector('.hint-label').textContent = kind === 'color' ? 'Cor' : (kind === 'generation' ? 'Geração' : 'Tipo');
+                btn.querySelector('.hint-label').textContent = kind === 'color' ? 'Codinome' : (kind === 'generation' ? 'Geração' : 'Tipo');
                 if (kind === 'type') {
                     btn.querySelector('.hint-value').innerHTML = state.types.map(t => {
                         const label = TYPE_LABEL[t] || t;
@@ -298,14 +310,14 @@
         }
     }
 
-    // Carrega a lista completa de nomes para o Autocomplete (datalist)
+    
     async function loadPokemonSuggestions() {
         if (!els.datalist) return;
         try {
             const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=' + MAX_DEX_ID);
             if (!res.ok) return;
             const data = await res.json();
-            
+
             const fragment = document.createDocumentFragment();
             data.results.forEach(p => {
                 const option = document.createElement('option');
@@ -316,8 +328,16 @@
             });
             els.datalist.appendChild(fragment);
         } catch (e) {
-            // Falha silenciosa se não carregar as sugestões
         }
+    }
+    
+    function extractGenus(species) {
+        if (!species.genera || !species.genera.length) return '';
+        const ptBR = species.genera.find(g => g.language.name === 'pt-BR');
+        const pt = species.genera.find(g => g.language.name === 'pt');
+        const en = species.genera.find(g => g.language.name === 'en');
+        const entry = ptBR || pt || en;
+        return entry ? entry.genus : '';
     }
 
     async function fetchPokemon(id) {
@@ -342,6 +362,7 @@
             namePt,
             displayName: namePt,
             color: species.color ? species.color.name : '',
+            genus: extractGenus(species),
             generation: species.generation ? species.generation.name : '',
             types: poke.types.map(t => t.type.name),
             imgUrl: artwork
@@ -350,14 +371,14 @@
 
     function buildScreenImage(imgUrl) {
         if (!els.holder) return;
-        
+
         els.holder.innerHTML =
             '<img id="poke-img" src="' + imgUrl + '" class="hidden-img" alt="Silhueta de Pokémon">' +
             '<div class="sweep" id="sweep-el"></div>';
-            
+
         const img = document.getElementById('poke-img');
         if (img) {
-            img.onload = () => { 
+            img.onload = () => {
                 img.classList.remove('hidden-img');
                 if (state.solved || state.giveUp) {
                     img.classList.add('revealed');
@@ -398,6 +419,7 @@
             namePt: data.namePt,
             displayName: data.displayName,
             color: data.color,
+            genus: data.genus,
             generation: data.generation,
             types: data.types,
             imgUrl: data.imgUrl,
